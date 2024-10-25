@@ -15,7 +15,7 @@ public class PrimesWriter {
 
 	public void writeToFile() {
 		try (var printWriter = new PrintWriter(FILE)) {
-			printWriter.printf("%6s","Prime numbers:%n");
+			printWriter.printf("%6s%n","Prime numbers:");
 			for (Integer prime : reversedPrimes) {
 				printWriter.printf("%6d%n", prime);
 			}
