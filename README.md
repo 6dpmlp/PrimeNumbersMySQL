@@ -47,16 +47,16 @@ Example Command-Line Output
 
 plaintext
 
-Please enter a positive integer not bigger than 1 000 000: 999999
+Please enter a positive integer not bigger than 10 000 000: 999999
 
 Deletion of table
-Query has performed!
+Deletion has performed!
 
 Insertion to table
-Query has performed!
+Insertion has performed!
 
 Reading data from SQL
-Query has performed!
+Reading has performed!
 
 Thank you for using this program!
 Now you have the numbers listed in primes.txt.
