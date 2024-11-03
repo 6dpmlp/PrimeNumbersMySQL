@@ -6,7 +6,7 @@ import java.util.stream.IntStream;
 
 public class PrimesCreator {
 	private final int maxValue;
-	private final List<Integer> primes;
+	private List<Integer> primes;
 
 	public PrimesCreator(int maxValue) {
 		this.maxValue = maxValue;

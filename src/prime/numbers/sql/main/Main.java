@@ -1,21 +1,18 @@
 package prime.numbers.sql.main;
 
-import prime.numbers.sql.general.classes.PrimesCreator;
-
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Properties;
-import java.util.Queue;
 
 import prime.numbers.sql.general.classes.GeneralInfo;
+import prime.numbers.sql.general.classes.PrimesCreator;
+import prime.numbers.sql.general.classes.PrimesWriter;
 import prime.numbers.sql.general.classes.UserInput;
-import prime.numbers.sql.solution1.QueryServicePointImpl;
 
 public class Main {
-
-	private static final Queue<Query> QUERIES = QueryServicePointImpl.getInstance().getQueries();
 
 	public static void main(String[] args) {
 		new Main().run();
@@ -28,15 +25,15 @@ public class Main {
 		var primes = new PrimesCreator(userInput).getPrimes();
 		try {
 			Connection connection = getConnection();
-			for (Query query : QUERIES) {
-				query.execute(connection, primes);
-			}
+			var operations = new SQLOperations(primes, connection);
+			List<Integer> primesRead = operations.readTable();
+			new PrimesWriter(primesRead).writeToFile();
+			genInfo.sayGoodbye();
 		} catch (SQLException se) {
-			System.out.println(se.getMessage());
+			System.out.println("There is an issue with the SQL commands!");
 		} catch (IOException io) {
 			System.out.println(io.getMessage());
 		}
-		genInfo.sayGoodbye();
 	}
 
 	private Connection getConnection() throws SQLException, IOException {

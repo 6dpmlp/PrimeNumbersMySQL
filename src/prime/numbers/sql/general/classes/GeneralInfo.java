@@ -2,7 +2,7 @@ package prime.numbers.sql.general.classes;
 
 public class GeneralInfo {
 
-	public static final int MAX_VALUE = 1_000_000;
+	public static final int MAX_VALUE = 10_000_000;
 
 	public void presentProgram() {
 		System.out.printf("""
