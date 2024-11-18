@@ -5,22 +5,30 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 public class PrimesWriter {
-	private static final File FILE = new File("D:\\Development\\Workspace\\PrimeNumbersMySQL\\primes.txt");
-	private final List<Integer> reversedPrimes;
+	private static final File FILE = new File("primes.txt");
+	private final long[] primes;
+	private final long userInput;
 
-	public PrimesWriter(List<Integer> reversedPrimes) {
-		this.reversedPrimes = reversedPrimes;
-		Collections.reverse(reversedPrimes);
+	public PrimesWriter(long[] primes, long userInput) {
+		this.primes = reverse(primes);
+		this.userInput = userInput;
+	}
+
+	private long[] reverse(long[] primes) {
+		List<Long> longList = LongStream.of(primes).mapToObj(i -> i).collect(Collectors.toList());
+		Collections.reverse(longList);
+		return longList.stream().mapToLong(Long::valueOf).toArray();
 	}
 
 	// utilisation of PrintWriter as it is not prone to IOException
 	public void writeToFile() {
 		try (var printWriter = new PrintWriter(FILE)) {
-			printWriter.printf("There are %d prime numbers until %,d, which are the following ones:%n", reversedPrimes.size(),
-					GeneralInfo.getMaxValue());
-			for (Integer prime : reversedPrimes) {
+			printWriter.printf("There are %d prime numbers until %,d, which are the following ones:%n", primes.length, userInput);
+			for (long prime : primes) {
 				printWriter.printf("      %,d%n", prime);
 			}
 		} catch (FileNotFoundException fne) {

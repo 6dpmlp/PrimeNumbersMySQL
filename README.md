@@ -1,7 +1,7 @@
 PrimeNumbersMySQL
 This Java program calculates prime numbers up to a user-specified limit, interacts with a MySQL database to store these primes, and saves the data to a file. Specifically, the program:
 
-    Prompts the user to input a number, then calculates all prime numbers up to that limit.
+    Prompts the user to input a number, then calculates all prime numbers up to that limit whith the help of multithreading.
     Deletes an existing MySQL table if present.
     Inserts the calculated prime numbers into the database table.
     Reads back the primes from the table, reverses their order, and writes them to a text file.

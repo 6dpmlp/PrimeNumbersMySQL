@@ -1,44 +1,56 @@
 package prime.numbers.sql.general.classes;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.stream.LongStream;
 
 public class PrimesCreator {
-	private final int maxValue;
-	private List<Integer> primes;
+	private static final int THREAD_NUM = Runtime.getRuntime().availableProcessors();
+	private static final int THRESHOLD = 100_000_000;
+	private final int taskNum;
+	private final long maxValue;
+	private final long root;
 
-	public PrimesCreator(int maxValue) {
+	public PrimesCreator(long maxValue) {
 		this.maxValue = maxValue;
-		this.primes = calculatePrimes();
+		taskNum = maxValue > THRESHOLD ? 1000 : 100;
+		root = (long) Math.sqrt(maxValue);
 	}
 
-	private List<Integer> calculatePrimes() {
-		return Collections.synchronizedList(//
-				IntStream.rangeClosed(2, maxValue)//
-						.parallel()//
-						.boxed()//
-						.filter(this::isPrime)//
-						.toList());
+	public long[] calculatePrimes() {
+		long[] basePrimes = new BasePrimesCreator(root + 1).calculate();
+		ExecutorService executor = Executors.newFixedThreadPool(THREAD_NUM);
+		List<SubTask> subTasks = createSubTasks(basePrimes);
+		List<Future<long[]>> futures = subTasks.stream().map(executor::submit).toList();
+		executor.shutdown();
+		return getPrimes(basePrimes, futures);
 	}
 
-	private boolean isPrime(Integer number) {
-		if (number == 2) {
-			return true;
+	private List<SubTask> createSubTasks(long[] basePrimes) {
+		List<SubTask> subTasks = new ArrayList<>();
+		long range = maxValue / taskNum;
+		for (int i = 0; i < THREAD_NUM; i++) {
+			long start = range * i + 1;
+			long end = i == THREAD_NUM - 1 ? maxValue : range * (i + 1);
+			subTasks.add(new SubTask(start, end, basePrimes));
 		}
-		if (number % 2 == 0) {
-			return false;
-		}
-		int root = (int) Math.sqrt(number);
-		for (int i = 3; i <= root; i += 2) {
-			if (number % i == 0) {
-				return false;
-			}
-		}
-		return true;
+		return subTasks;
 	}
 
-	public List<Integer> getPrimes() {
-		return primes;
+	private long[] getPrimes(long[] basePrimes, List<Future<long[]>> futures) {
+		return LongStream.concat(LongStream.of(basePrimes), //
+				futures.stream().map(this::getTask).flatMapToLong(LongStream::of)).toArray();
+	}
+
+	private long[] getTask(Future<long[]> primeRange) {
+		try {
+			return primeRange.get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException("Check your code, should not be a problem here!");
+		}
 	}
 }

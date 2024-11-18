@@ -6,32 +6,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 class SQLOperations {
-	private final List<Integer> primes;
+	private final long[] primes;
 	private final Connection connection;
 
-	SQLOperations(List<Integer> primes, Connection connection) {
+	SQLOperations(long[] primes, Connection connection) {
 		this.primes = primes;
 		this.connection = connection;
 	}
 
-	List<Integer> readTable() throws SQLException {
+	long[] readTable() throws SQLException {
 		deleteTable();
 		insertTable();
-		List<Integer> primesFromTable = new ArrayList<>();
-		System.out.printf("%s%n", "Reading from table");
+		System.out.printf("%s%n", "Reading from table is in progress...");
+		List<Long> primesFromTable = new ArrayList<>();
 		try (var ps = connection.prepareStatement("SELECT prime_numbers from prime_numbers"); var rs = ps.executeQuery()) {
-			primesFromTable = new ArrayList<>();
 			while (rs.next()) {
-				int prime = rs.getInt("prime_numbers");
+				Long prime = rs.getLong("prime_numbers");
 				primesFromTable.add(prime);
 			}
 		}
 		System.out.printf("Reading has been performed!%n%n");
-		return primesFromTable;
+		return primesFromTable.stream().mapToLong(Long::valueOf).toArray();
 	}
 
 	private void deleteTable() throws SQLException {
-		System.out.printf("%n%s%n", "Deletion of table");
+		System.out.printf("%n%s%n", "Deletion of table is in progress...");
 		try (var ps = connection.prepareStatement("DELETE from prime_numbers")) {
 			ps.executeUpdate();
 		}
@@ -39,16 +38,22 @@ class SQLOperations {
 	}
 
 	private void insertTable() throws SQLException {
-		System.out.printf("%s%n", "Insertion to table");
+		System.out.printf("%s%n", "Insertion to table is in progress...");
 		connection.setAutoCommit(false);
+		final int batchSize = 10_000;
+		int count = 1;
 		try (var ps = connection.prepareStatement("INSERT INTO prime_numbers (prime_numbers) VALUES (?)")) {
-			for (int prime : primes) {
-				ps.setInt(1, prime);
+			for (Long prime : primes) {
+				ps.setLong(1, prime);
 				ps.addBatch();
+				if (count++ % batchSize == 0) {
+					ps.executeBatch();
+				}
 			}
 			ps.executeBatch();
 			connection.commit();
 		}
+		connection.setAutoCommit(true);
 		System.out.printf("Insertion has been performed!%n%n");
 	}
 }

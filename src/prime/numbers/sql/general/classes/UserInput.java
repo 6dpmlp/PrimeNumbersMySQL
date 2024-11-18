@@ -4,15 +4,15 @@ import java.util.Scanner;
 
 public class UserInput {
 
-	public static final int MAX_VALUE = GeneralInfo.getMaxValue();
+	public static final long MAX_VALUE = GeneralInfo.getMaxValue();
 
-	public int askForUserInput() {
-		int userInput = Integer.MIN_VALUE;
+	public long askForUserInput() {
+		long userInput = Long.MIN_VALUE;
 		try (var scn = new Scanner(System.in);) {
 			do {
 				System.out.printf("Please enter a positive integer not bigger than %,d: ", MAX_VALUE);
 				try {
-					userInput = Integer.parseInt(scn.nextLine().strip());
+					userInput = Long.parseLong(scn.nextLine().strip());
 				} catch (NumberFormatException nfe) {
 				}
 			} while (userInput < 0 || userInput > MAX_VALUE);

@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Properties;
 
 import prime.numbers.sql.general.classes.GeneralInfo;
@@ -22,12 +23,14 @@ public class Main {
 		var genInfo = new GeneralInfo();
 		genInfo.presentProgram();
 		var userInput = new UserInput().askForUserInput();
-		var primes = new PrimesCreator(userInput).getPrimes();
+		Instant instant = Instant.now();
+		var primes = new PrimesCreator(userInput).calculatePrimes();
+		System.out.printf("Primes are calculated under %.3f", Duration.between(instant, Instant.now()).toMillis() / 1000.0);
 		try {
 			Connection connection = getConnection();
 			var operations = new SQLOperations(primes, connection);
-			List<Integer> primesRead = operations.readTable();
-			new PrimesWriter(primesRead).writeToFile();
+			long[] primesRead = operations.readTable();
+			new PrimesWriter(primesRead, userInput).writeToFile();
 			genInfo.sayGoodbye();
 		} catch (SQLException se) {
 			System.out.println("There is an issue with the SQL commands!");
