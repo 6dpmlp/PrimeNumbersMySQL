@@ -11,7 +11,7 @@ record BasePrimesCreator(long limit) {
 	}
 
 	private boolean isPrime(long number) {
-		for (long i = 3L; i * i < number; i += 2) {
+		for (long i = 3L; i * i <= number; i += 2) {
 			if (number % i == 0) {
 				return false;
 			}

@@ -32,10 +32,10 @@ public class PrimesCreator {
 
 	private List<SubTask> createSubTasks(long[] basePrimes) {
 		List<SubTask> subTasks = new ArrayList<>();
-		long range = maxValue / taskNum;
-		for (int i = 0; i < THREAD_NUM; i++) {
-			long start = range * i + 1;
-			long end = i == THREAD_NUM - 1 ? maxValue : range * (i + 1);
+		long range = (maxValue - root) / taskNum;
+		for (int i = 0; i < taskNum; i++) {
+			long start = root + 1 + i * range;
+			long end = i == taskNum - 1 ? maxValue : root + 1 + (i + 1) * range;
 			subTasks.add(new SubTask(start, end, basePrimes));
 		}
 		return subTasks;

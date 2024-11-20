@@ -31,7 +31,7 @@ class SQLOperations {
 
 	private void deleteTable() throws SQLException {
 		System.out.printf("%n%s%n", "Deletion of table is in progress...");
-		try (var ps = connection.prepareStatement("DELETE from prime_numbers")) {
+		try (var ps = connection.prepareStatement("DELETE from prime_numbers WHERE TRUE")) {
 			ps.executeUpdate();
 		}
 		System.out.printf("Deletion has been performed!%n%n");

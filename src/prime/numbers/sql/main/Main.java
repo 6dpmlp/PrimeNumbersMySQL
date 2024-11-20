@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Properties;
 
 import prime.numbers.sql.general.classes.GeneralInfo;
@@ -23,9 +21,7 @@ public class Main {
 		var genInfo = new GeneralInfo();
 		genInfo.presentProgram();
 		var userInput = new UserInput().askForUserInput();
-		Instant instant = Instant.now();
-		var primes = new PrimesCreator(userInput).calculatePrimes();
-		System.out.printf("Primes are calculated under %.3f", Duration.between(instant, Instant.now()).toMillis() / 1000.0);
+		var primes = new PrimesCreator(userInput + 1).calculatePrimes();
 		try {
 			Connection connection = getConnection();
 			var operations = new SQLOperations(primes, connection);

@@ -6,7 +6,7 @@ import java.util.stream.LongStream;
 record SubTask(long start, long finish, long[] basePrimes) implements Callable<long[]> {
 	@Override
 	public long[] call() {
-		return LongStream.iterate(start, l -> l < finish, l -> l + 2)//
+		return LongStream.range(start, finish)//
 				.filter(this::isPrime)//
 				.toArray();
 	}
